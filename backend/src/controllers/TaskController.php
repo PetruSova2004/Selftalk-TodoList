@@ -4,27 +4,45 @@ namespace controllers;
 
 require_once(__DIR__ . '/../models/Task.php');
 require_once(__DIR__ . '/../services/ResponseService.php');
-require_once(__DIR__ . '/../requests/validators/TaskRequestValidator.php'); // Adjust path as needed
+require_once(__DIR__ . '/../requests/validators/TaskRequestValidator.php');
 
 use Exception;
 use models\Task;
 use PDOException;
 use services\ResponseService;
-use controllers\requests\validators\TaskRequestValidator; // Adjust namespace as needed
+use controllers\requests\validators\TaskRequestValidator;
 
 class TaskController
 {
+    /**
+     * @var Task $taskModel Instance of Task model.
+     */
     private Task $taskModel;
+
+    /**
+     * @var ResponseService $responseService Instance of ResponseService.
+     */
     private ResponseService $responseService;
+
+    /**
+     * @var TaskRequestValidator $validator Instance of TaskRequestValidator.
+     */
     private TaskRequestValidator $validator;
 
+    /**
+     * Initializes the task model, response service, and validator.
+     */
     public function __construct()
     {
         $this->taskModel = new Task();
         $this->responseService = new ResponseService();
-        $this->validator = new TaskRequestValidator(); // Instantiate the validator
+        $this->validator = new TaskRequestValidator();
     }
 
+    /**
+     * Retrieves all tasks from the database.
+     * @return string
+     */
     public function getAllTasks(): string
     {
         try {
@@ -35,6 +53,10 @@ class TaskController
         return $this->responseService->successResponse(200, 'Successfully retrieved items', $tasks);
     }
 
+    /**
+     * Adds a new task to the database.
+     * @return false|string
+     */
     public function addTask(): false|string
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -63,6 +85,10 @@ class TaskController
         }
     }
 
+    /**
+     * Updates an existing task in the database.
+     * @return string|null
+     */
     public function updateTask(): string|null
     {
         $postData = file_get_contents('php://input');
@@ -91,6 +117,10 @@ class TaskController
         }
     }
 
+    /**
+     * Deletes a task from the database.
+     * @return string
+     */
     public function deleteTask(): string
     {
         try {
@@ -115,3 +145,4 @@ class TaskController
         }
     }
 }
+
