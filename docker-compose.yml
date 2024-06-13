@@ -23,9 +23,14 @@ services:
       MYSQL_PASSWORD: AnotherStrongPassword456!
     ports:
       - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql-data:
