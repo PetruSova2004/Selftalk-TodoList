@@ -56,7 +56,7 @@ This project is a Todo-List application developed using plain PHP for the backen
 
 ## Usage
 
-1. **Run the database migrations and seeders:**
+1. **Run the database migrations and seeders from backend container:**
     ```bash
     php database/migrations/2024_06_13_120000_create_tasks_table.php
     php database/seeds/TaskSeeder.php
