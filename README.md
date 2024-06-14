@@ -10,9 +10,7 @@ This project is a Todo-List application developed using plain PHP for the backen
 - [Installation](#installation)
 - [Usage](#usage)
 - [Database Setup](#database-setup)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Features
 
