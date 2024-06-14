@@ -1,15 +1,15 @@
 <template>
   <div class="wrapper">
-    <Slider />
+    <Slider/>
     <div class="content-wrapper">
       <section class="content-header">
-        <Header />
+        <Header/>
       </section>
 
       <!-- Main content -->
       <section class="content">
-        <div class="container-fluid" style="margin-left: 20%">
-          <div class="row">
+        <div class="container-fluid">
+          <div class="row" style="margin-left: 20%">
             <div class="col-md-6 ">
               <div class="card card-danger">
                 <div class="card-header">
@@ -56,7 +56,7 @@
         </div>
       </section>
     </div>
-    <Footer />
+    <Footer/>
   </div>
 </template>
 
@@ -81,27 +81,47 @@ export default {
     };
   },
   methods: {
+    validateInput(input) {
+      const invalidChars = /[`~!#$%^&*()+={}[\]|\\:;"'<>,?]/;
+      return !invalidChars.test(input);
+    },
     saveTask() {
       if (!this.title || !this.description || !this.execution_date) {
         alert('Please fill in all required fields.');
         return;
       }
 
-      // Prepare data for POST request
+      if (!this.validateInput(this.title) || !this.validateInput(this.description)) {
+        alert('Input contains invalid characters.');
+        return;
+      }
+
       const postData = {
         title: this.title,
         description: this.description,
         execution_date: this.execution_date
       };
 
-      // Send POST request to the server
       axios.post(`${process.env.VUE_APP_BASE_URL}/tasks/add`, postData)
           .then(response => {
             if (response.data.success) {
               alert('Task was successfully added');
-              this.$router.push({ name: 'Home' });
+              this.$router.push({name: 'Home'});
             } else {
-              alert("Something went wrong, please try again later")
+              if (response.data.error) {
+                let errorMessage;
+                if (Array.isArray(response.data.error) && response.data.error.length > 0) {
+                  const firstError = response.data.error[0];
+                  errorMessage = typeof firstError === 'string' ? firstError : firstError[Object.keys(firstError)[0]];
+                } else if (typeof response.data.error === 'object') {
+                  errorMessage = response.data.error[Object.keys(response.data.error)[0]];
+                } else {
+                  errorMessage = response.data.error;
+                }
+                alert(errorMessage);
+              } else {
+                alert("Something went wrong, please try again later");
+              }
             }
           })
           .catch(error => {

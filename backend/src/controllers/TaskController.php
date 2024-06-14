@@ -109,7 +109,7 @@ class TaskController
             $requestData = [];
         }
 
-        $validationErrors = $this->validator->validateAddTask($requestData, $this->taskModel);
+        $validationErrors = $this->validator->validateAddTask($requestData);
         if ($validationErrors !== false) {
             return $this->responseService->errorResponse(400, 'Validation Error', $validationErrors);
         }

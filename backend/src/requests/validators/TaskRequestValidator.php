@@ -2,16 +2,18 @@
 
 namespace src\requests\validators;
 
+use Exception;
+use src\models\Task;
+
 class TaskRequestValidator
 {
     /**
      * Validate the data for adding a new task.
      *
      * @param array $data The data received from the request.
-     * @param $taskModel
      * @return array|false Array of validation errors or false if validation passes.
      */
-    public function validateAddTask(array $data, $taskModel): array|false
+    public function validateAddTask(array $data): array|false
     {
         $errors = [];
 
@@ -28,10 +30,6 @@ class TaskRequestValidator
             $errors['description'] = 'Invalid characters in description';
         }
 
-        if ($taskModel->taskExistsWithTitle($data['title'])) {
-            $errors['title'] = 'A task with this title already exists';
-        }
-
         return empty($errors) ? false : $errors;
     }
 
@@ -39,10 +37,11 @@ class TaskRequestValidator
      * Validate the data for retrieving a task by its ID.
      *
      * @param array $data
-     * @param $taskModel
+     * @param Task $taskModel
      * @return array|false
+     * @throws Exception
      */
-    public function validateShowTask(array $data, $taskModel): array|false
+    public function validateShowTask(array $data, Task $taskModel): array|false
     {
         $errors = [];
 

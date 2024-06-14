@@ -145,27 +145,6 @@ class Task
     }
 
     /**
-     * Check if a task with the given title already exists in the database.
-     *
-     * @param string $title
-     * @return bool
-     * @throws Exception
-     */
-    public function taskExistsWithTitle(string $title): bool
-    {
-        try {
-            $stmt = $this->conn->prepare("SELECT COUNT(*) AS count FROM tasks WHERE title = :title");
-            $stmt->bindParam(':title', $title);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $result['count'] > 0;
-        } catch (PDOException $e) {
-            throw new Exception("Failed to check if task exists with title: " . $e->getMessage());
-        }
-    }
-
-    /**
      * @param int $id
      * @return bool
      * @throws Exception

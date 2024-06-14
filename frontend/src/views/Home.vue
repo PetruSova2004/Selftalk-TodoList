@@ -2,9 +2,8 @@
   <div class="wrapper">
     <Slider/>
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
       <section class="content-header">
-      <Header/>
+        <Header/>
       </section>
 
       <!-- Main content -->
@@ -107,13 +106,13 @@ export default {
           id: taskId
         }
       }).then(response => {
-            console.log(response);
-            if (response.data.success) {
-              this.fetchTasks();
-            } else {
-              console.error('Error deleting task:', response.data.message);
-            }
-          })
+        console.log(response);
+        if (response.data.success) {
+          this.fetchTasks();
+        } else {
+          console.error('Error deleting task:', response.data.message);
+        }
+      })
           .catch(error => {
             console.error('Error deleting task:', error);
           });
