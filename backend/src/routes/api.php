@@ -11,6 +11,7 @@ $routes = [
     'groups' => [
         'TaskController' => [
             'list' => ['GET', 'getAllTasks'],
+            'show' => ['GET', 'showTask'],
             'add' => ['POST', 'addTask'],
             'edit' => ['PUT', 'updateTask'],
             'delete' => ['DELETE', 'deleteTask'],

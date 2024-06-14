@@ -1,6 +1,6 @@
 <?php
 
-namespace controllers\requests\validators;
+namespace src\requests\validators;
 
 class TaskRequestValidator
 {
@@ -8,9 +8,10 @@ class TaskRequestValidator
      * Validate the data for adding a new task.
      *
      * @param array $data The data received from the request.
+     * @param $taskModel
      * @return array|false Array of validation errors or false if validation passes.
      */
-    public function validateAddTask(array $data): array|false
+    public function validateAddTask(array $data, $taskModel): array|false
     {
         $errors = [];
 
@@ -25,6 +26,36 @@ class TaskRequestValidator
             $errors['description'] = 'Description is required';
         } elseif (!$this->isValidString($data['description'])) {
             $errors['description'] = 'Invalid characters in description';
+        }
+
+        if ($taskModel->taskExistsWithTitle($data['title'])) {
+            $errors['title'] = 'A task with this title already exists';
+        }
+
+        return empty($errors) ? false : $errors;
+    }
+
+    /**
+     * Validate the data for retrieving a task by its ID.
+     *
+     * @param array $data
+     * @param $taskModel
+     * @return array|false
+     */
+    public function validateShowTask(array $data, $taskModel): array|false
+    {
+        $errors = [];
+
+        if (empty($data['id'])) {
+            $errors['id'] = 'Task ID is required';
+        } elseif (!ctype_digit((string) $data['id'])) {
+            $errors['id'] = 'Task ID must be a valid integer';
+        } else {
+            // Check if task with given ID exists
+            $id = (int) $data['id'];
+            if (!$taskModel->taskExistsWithId($id)) {
+                $errors['id'] = 'Task with ID ' . $id . ' does not exist';
+            }
         }
 
         return empty($errors) ? false : $errors;
