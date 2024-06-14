@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     ports:
-      - "8080:80"
+      - "8000:80"
     volumes:
       - ./backend:/var/www/html
     networks:
@@ -23,9 +23,24 @@ services:
       MYSQL_PASSWORD: AnotherStrongPassword456!
     ports:
       - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
     networks:
       - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql-data:

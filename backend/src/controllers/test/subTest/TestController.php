@@ -4,7 +4,7 @@ namespace controllers\test\subTest;
 
 require_once(__DIR__ . '/../../../models/Task.php');
 
-use models\Task;
+use src\models\Task;
 
 class TestController
 {

@@ -1,13 +1,11 @@
-# Dockerfile для frontend
-FROM node:18
-
-# Копирование исходного кода
-COPY ./ /app
-
-# Установка зависимостей и сборка приложения
+FROM node:18 as build-stage
 WORKDIR /app
+COPY package*.json ./
 RUN npm install
+COPY . .
 RUN npm run build
 
-# Запуск сервера
-CMD ["npm", "start"]
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

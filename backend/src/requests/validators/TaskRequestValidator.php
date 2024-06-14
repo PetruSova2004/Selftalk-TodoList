@@ -1,6 +1,9 @@
 <?php
 
-namespace controllers\requests\validators;
+namespace src\requests\validators;
+
+use Exception;
+use src\models\Task;
 
 class TaskRequestValidator
 {
@@ -25,6 +28,33 @@ class TaskRequestValidator
             $errors['description'] = 'Description is required';
         } elseif (!$this->isValidString($data['description'])) {
             $errors['description'] = 'Invalid characters in description';
+        }
+
+        return empty($errors) ? false : $errors;
+    }
+
+    /**
+     * Validate the data for retrieving a task by its ID.
+     *
+     * @param array $data
+     * @param Task $taskModel
+     * @return array|false
+     * @throws Exception
+     */
+    public function validateShowTask(array $data, Task $taskModel): array|false
+    {
+        $errors = [];
+
+        if (empty($data['id'])) {
+            $errors['id'] = 'Task ID is required';
+        } elseif (!ctype_digit((string) $data['id'])) {
+            $errors['id'] = 'Task ID must be a valid integer';
+        } else {
+            // Check if task with given ID exists
+            $id = (int) $data['id'];
+            if (!$taskModel->taskExistsWithId($id)) {
+                $errors['id'] = 'Task with ID ' . $id . ' does not exist';
+            }
         }
 
         return empty($errors) ? false : $errors;

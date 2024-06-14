@@ -7,10 +7,10 @@ require_once(__DIR__ . '/../services/ResponseService.php');
 require_once(__DIR__ . '/../requests/validators/TaskRequestValidator.php');
 
 use Exception;
-use models\Task;
+use src\models\Task;
 use PDOException;
 use services\ResponseService;
-use controllers\requests\validators\TaskRequestValidator;
+use src\requests\validators\TaskRequestValidator;
 
 class TaskController
 {
@@ -54,6 +54,40 @@ class TaskController
     }
 
     /**
+     * Retrieves a task by its ID from the database and returns it as JSON.
+     *
+     * @return string
+     */
+    public function showTask(): string
+    {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                return $this->responseService->errorResponse(405, 'Method Not Allowed');
+            }
+
+            $data = [
+                'id' => $_GET['id']
+            ];
+
+            $validationErrors = $this->validator->validateShowTask($data, $this->taskModel);
+            if ($validationErrors !== false) {
+                return $this->responseService->errorResponse(400, 'Validation Error', $validationErrors);
+            }
+
+            $id = $data['id'] ?? null;
+            $task = $this->taskModel->getTaskById($id);
+
+            if ($task) {
+                return $this->responseService->successResponse(200, 'Task found', $task);
+            } else {
+                return $this->responseService->errorResponse(404, 'Task not found');
+            }
+        } catch (Exception $e) {
+            return $this->responseService->errorResponse($e->getCode(), 'Failed to retrieve task', $e->getMessage());
+        }
+    }
+
+    /**
      * Adds a new task to the database.
      * @return false|string
      */
@@ -62,20 +96,27 @@ class TaskController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->responseService->errorResponse(405, 'Method Not Allowed');
         }
-
-        // Get data from the POST request body
         $postData = file_get_contents('php://input');
-        parse_str($postData, $data);
+        $requestData = json_decode($postData, true);
 
-        // Validate the data using the validator
-        $validationErrors = $this->validator->validateAddTask($data);
+        // Check if decoding was successful
+        if ($requestData === null) {
+            $requestData = [];
+            parse_str($postData, $requestData);
+        }
+
+        if (!is_array($requestData)) {
+            $requestData = [];
+        }
+
+        $validationErrors = $this->validator->validateAddTask($requestData);
         if ($validationErrors !== false) {
             return $this->responseService->errorResponse(400, 'Validation Error', $validationErrors);
         }
 
-        $title = $data['title'];
-        $description = $data['description'];
-        $executionDate = $data['execution_date'] ?? null;
+        $title = $requestData['title'];
+        $description = $requestData['description'];
+        $executionDate = $requestData['execution_date'] ?? null;
 
         try {
             $this->taskModel->addTask($title, $description, $executionDate);
@@ -92,7 +133,17 @@ class TaskController
     public function updateTask(): string|null
     {
         $postData = file_get_contents('php://input');
-        parse_str($postData, $requestData);
+        $requestData = json_decode($postData, true);
+
+        // Check if decoding was successful
+        if ($requestData === null) {
+            $requestData = [];
+            parse_str($postData, $requestData);
+        }
+
+        if (!is_array($requestData)) {
+            $requestData = [];
+        }
 
         // Validate the data using the validator
         $validationErrors = $this->validator->validateUpdateTask($requestData);
@@ -125,9 +176,19 @@ class TaskController
     {
         try {
             $postData = file_get_contents('php://input');
-            parse_str($postData, $requestData);
+            $requestData = json_decode($postData, true);
 
-            $id = $requestData['id'];
+            // Check if decoding was successful
+            if ($requestData === null) {
+                $requestData = [];
+                parse_str($postData, $requestData);
+            }
+
+            if (!is_array($requestData)) {
+                $requestData = [];
+            }
+
+            $id = $requestData['id'] ?? null;
 
             $validationErrors = $this->validator->validateDeleteTask($requestData);
             if ($validationErrors !== false) {
@@ -144,5 +205,6 @@ class TaskController
             return $this->responseService->errorResponse($e->getCode(), 'Failed to delete task', $e->getMessage());
         }
     }
+
 }
 

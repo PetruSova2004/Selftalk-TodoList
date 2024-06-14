@@ -1,6 +1,6 @@
 <?php
 
-namespace models;
+namespace src\models;
 
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../database/Database.php');
@@ -69,6 +69,26 @@ class Task
     }
 
     /**
+     * Retrieves a task by its ID from the database.
+     *
+     * @param int $id
+     * @return array|null
+     * @throws Exception
+     */
+    public function getTaskById(int $id): ?array
+    {
+        try {
+            $stmt = $this->conn->prepare("SELECT * FROM tasks WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $task = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $task ?? null;
+        } catch (PDOException $e) {
+            throw new Exception("Failed to retrieve task with ID $id: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Updates an existing task in the database.
      *
      * @param $id
@@ -121,6 +141,25 @@ class Task
             return true;
         } catch(PDOException $e) {
             throw new Exception("Failed to delete task: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     * @throws Exception
+     */
+    public function taskExistsWithId(int $id): bool
+    {
+        try {
+            $stmt = $this->conn->prepare("SELECT COUNT(*) AS count FROM tasks WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $result['count'] > 0;
+        } catch (PDOException $e) {
+            throw new Exception("Failed to check if task exists with ID: " . $e->getMessage());
         }
     }
 

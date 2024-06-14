@@ -1,6 +1,15 @@
 <?php
 
 try {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        http_response_code(200);
+        exit();
+    }
+
     $routes = require_once __DIR__ . '/src/routes/api.php';
 
     $method = $_SERVER['REQUEST_METHOD'];
@@ -9,6 +18,10 @@ try {
     $url_parts = explode('/', trim($request_uri, '/'));
     $prefix = $url_parts[0];
     $path = $url_parts[1] ?? '';
+
+    if (str_contains($path, '?')) {
+        $path = substr($path, 0, strpos($path, '?'));
+    }
 
     header('Content-type: application/json; charset=utf-8');
 
